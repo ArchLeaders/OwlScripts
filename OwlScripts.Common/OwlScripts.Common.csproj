@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="SarcLibrary" Version="3.3.5" />
+    <PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
   </ItemGroup>
 
 </Project>
