@@ -7,4 +7,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BymlLibrary" Version="2.1.18" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OwlScripts.Common\OwlScripts.Common.csproj" />
+  </ItemGroup>
+
 </Project>
