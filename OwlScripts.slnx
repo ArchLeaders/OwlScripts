@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Internal/">
+    <Project Path="Internal/OwlScripts.Benchmarks/OwlScripts.Benchmarks.csproj" />
+  </Folder>
   <Project Path="OwlScripts.BgymlKeyFinder/OwlScripts.BgymlKeyFinder.csproj" />
   <Project Path="OwlScripts.Common/OwlScripts.Common.csproj" />
 </Solution>
