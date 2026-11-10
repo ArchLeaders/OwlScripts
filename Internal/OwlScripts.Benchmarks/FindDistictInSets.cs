@@ -75,7 +75,7 @@ public class FindDistictInSets
             var set = _collection[setIndex];
             for (int i = 0; i < result.Count;) {
                 var element = result[i];
-                if (set.IndexOf(element) > -1) {
+                if (set.Contains(element)) {
                     i++;
                     continue;
                 }
