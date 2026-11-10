@@ -59,7 +59,7 @@ public sealed class Romfs
             romfsFile = romfsFile with { Data = spanOwner.Span };
 
             if (spanOwner.Span.Read<uint>() == SarcMagic) {
-                EnumerateLiteInArchive(romfsFile, action, context);
+                EnumerateLiteInArchive(romfsFile, action, predicate, context);
                 continue;
             }
 
@@ -67,18 +67,24 @@ public sealed class Romfs
         }
     }
 
-    private static void EnumerateLiteInArchive<TContext>(in RomfsFile target, Action<RomfsFile, TContext> action, TContext context)
+    private static void EnumerateLiteInArchive<TContext>(in RomfsFile target, Action<RomfsFile, TContext> action, Func<RomfsFile, TContext, bool> predicate, TContext context)
     {
         var reader = new RevrsReader(target.Data);
         var sarc = new ImmutableSarc(ref reader);
 
         foreach (var (file, data) in sarc) {
-            action(new RomfsFile {
+            var romfsFile = new RomfsFile {
                 CanonicalFilePath = file,
                 FileVersion = target.FileVersion,
                 FileAttributes = RomfsFileAttributes.None,
                 Data = data
-            }, context);
+            };
+            
+            if (!predicate(romfsFile, context)) {
+                continue;
+            }
+            
+            action(romfsFile, context);
         }
     }
 
