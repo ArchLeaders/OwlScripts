@@ -20,11 +20,11 @@ Console.WriteLine($"""
 
     """);
 
-if (args is not [var gameDumpFolderPath]) {
+if (args is not [var gameDumpFolderPath, var output]) {
     Console.WriteLine("""
         USAGE:
 
-        OwlScripts.BgymlKeyFinder <game-path>
+        OwlScripts.BgymlKeyFinder <game-path> <output>
         """);
     return;
 }
@@ -51,7 +51,7 @@ var options = new JsonSerializerOptions {
 };
 
 var json = JsonSerializer.Serialize(context.EvaluationResults, options);
-File.WriteAllText(@"D:\bin\owlscripts\evaluation.json", json);
+File.WriteAllText(output, json);
 
 return;
 
