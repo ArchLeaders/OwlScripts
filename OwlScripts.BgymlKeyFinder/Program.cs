@@ -69,7 +69,17 @@ foreach (string type in remove) {
     context.EvaluationResults.Remove(type);
 }
 
-var json = JsonSerializer.Serialize(context.EvaluationResults, options);
+var json = JsonSerializer.Serialize(
+    context.EvaluationResults
+        .OrderBy(x => x.Key)
+        .ToDictionary(x => x.Key, x => x.Value with {
+            Arrays = x.Value.Arrays
+                .OrderBy(static x => x.Key)
+                .ToDictionary(),
+            Files = x.Value.Files.Order().ToHashSet()
+        }),
+    options);
+
 File.WriteAllText(output, json);
 
 Console.WriteLine($"Evaluation summary written to {output}");
