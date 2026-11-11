@@ -89,7 +89,8 @@ static void EvaluateFile(RomfsFile file, ScriptContext context)
     }
 
     ref var evaluation = ref CollectionsMarshal.GetValueRefOrAddDefault(context.EvaluationResults, bgymlTypeName, out _);
-    evaluation ??= new BgymlEvaluationResult(bgymlTypeName, file.CanonicalFilePath, Arrays: []);
+    evaluation ??= new BgymlEvaluationResult(bgymlTypeName, Files: [], Arrays: []);
+    evaluation.Files.Add(file.CanonicalFilePath);
     
     EvaluateBymlMap(ref byml, byml.GetMap(), context, evaluation);
 }

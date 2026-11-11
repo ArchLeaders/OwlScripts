@@ -2,6 +2,6 @@ namespace OwlScripts.BgymlKeyFinder.Models;
 
 public record BgymlEvaluationResult(
     string Type,
-    string CanonicalFileName,
+    HashSet<string> Files,
     Dictionary<string, List<string>> Arrays
 );
