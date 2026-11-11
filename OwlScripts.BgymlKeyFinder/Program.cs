@@ -72,12 +72,9 @@ foreach (string type in remove) {
 var json = JsonSerializer.Serialize(
     context.EvaluationResults
         .OrderBy(x => x.Key)
-        .ToDictionary(x => x.Key, x => x.Value with {
-            Arrays = x.Value.Arrays
-                .OrderBy(static x => x.Key)
-                .ToDictionary(),
-            Files = x.Value.Files.Order().ToHashSet()
-        }),
+        .ToDictionary(x => x.Key, x => new BgymlEvaluationResult(Arrays: x.Value.Arrays
+            .OrderBy(static x => x.Key)
+            .ToDictionary(), Files: [.. x.Value.Files.Order()])),
     options);
 
 File.WriteAllText(output, json);
@@ -99,9 +96,9 @@ static void EvaluateFile(RomfsFile file, ScriptContext context)
     }
 
     ref var evaluation = ref CollectionsMarshal.GetValueRefOrAddDefault(context.EvaluationResults, bgymlTypeName, out _);
-    evaluation ??= new BgymlEvaluationResult(bgymlTypeName, Files: [], Arrays: []);
+    evaluation ??= new BgymlEvaluationResult(Files: [], Arrays: []);
     evaluation.Files.Add(file.CanonicalFilePath);
-    
+
     EvaluateBymlMap(ref byml, byml.GetMap(), context, evaluation);
 }
 
@@ -127,7 +124,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
     }
 
     int startIndex = 0;
-    
+
     if (keys is null) {
         var first = array[0].GetMap();
         keys = new List<string>(first.Count);
@@ -137,10 +134,10 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
                 keys.Add(key);
             }
         }
-        
+
         startIndex = 1;
     }
-    
+
     for (int arrayIndex = startIndex; arrayIndex < array.Count; arrayIndex++) {
         var node = array[arrayIndex];
 
@@ -157,7 +154,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
                 if (EvaluateMapElement(ref root, keyIndex, value, context, evaluation) is not { } key) {
                     continue;
                 }
-                
+
                 exists = key == keys[i];
             }
 
@@ -165,7 +162,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
                 i++;
                 continue;
             }
-            
+
             keys.RemoveAt(i);
         }
     }
@@ -178,12 +175,12 @@ static string? EvaluateMapElement(ref ImmutableByml root, int key, ImmutableByml
         EvaluateBymlMap(ref root, value.GetMap(), context, evaluation);
         return null;
     }
-            
+
     // Skip node types that can never make a useful ID
     if (!value.Type.IsValueType() ||
         value.Type is BymlNodeType.Double or BymlNodeType.Float or BymlNodeType.Bool or BymlNodeType.Null) {
         return null;
     }
-            
+
     return root.KeyTable[key].ToManaged();
 }
