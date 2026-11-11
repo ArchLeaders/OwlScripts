@@ -82,7 +82,7 @@ static void EvaluateBymlMap(ref ImmutableByml root, ImmutableBymlMap map, Script
 
         if (child.Type is BymlNodeType.Array) {
             ref var keys = ref CollectionsMarshal.GetValueRefOrAddDefault(
-                evaluation.Arrays, root.StringTable[key].ToManaged(), out bool exists);
+                evaluation.Arrays, root.KeyTable[key].ToManaged(), out bool exists);
             EvaluateBymlArray(ref root, child.GetArray(), context, evaluation, ref keys);
         }
     }
@@ -153,5 +153,5 @@ static string? EvaluateMapElement(ref ImmutableByml root, int key, ImmutableByml
         return null;
     }
             
-    return root.StringTable[key].ToManaged();
+    return root.KeyTable[key].ToManaged();
 }
