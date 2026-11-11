@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using BymlLibrary;
 using BymlLibrary.Extensions;
 using BymlLibrary.Nodes.Immutable.Containers;
@@ -47,11 +48,31 @@ var elapsedTime = Stopwatch.GetElapsedTime(startingTimestamp, endingTimestamp);
 Console.WriteLine($"Evaluated {context.ProcessedFiles.Count:N0} files in {elapsedTime.Seconds} seconds");
 
 var options = new JsonSerializerOptions {
-    WriteIndented = true
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 };
+
+List<string> remove = [];
+foreach (var (type, eval) in context.EvaluationResults) {
+    foreach (var (parentKey, _) in eval.Arrays.Where(x => x.Value is null || x.Value.Count == 0).ToArray()) {
+        Console.WriteLine($"Trimming {type}/{parentKey} from evaluation (no common properties)");
+        eval.Arrays.Remove(parentKey);
+    }
+
+    if (eval.Arrays.Count == 0) {
+        remove.Add(type);
+        Console.WriteLine($"Trimming {type} from evaluation (no arrays)");
+    }
+}
+
+foreach (string type in remove) {
+    context.EvaluationResults.Remove(type);
+}
 
 var json = JsonSerializer.Serialize(context.EvaluationResults, options);
 File.WriteAllText(output, json);
+
+Console.WriteLine($"Evaluation summary written to {output}");
 
 return;
 
