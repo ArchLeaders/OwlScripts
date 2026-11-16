@@ -30,6 +30,9 @@ if (args is not [var gameDumpFolderPath, var output]) {
     return;
 }
 
+Config.Shared.GameDumpFolderPath = gameDumpFolderPath;
+Config.Save();
+
 var romfs = new Romfs(gameDumpFolderPath);
 var context = new ScriptContext(ProcessedFiles: [], EvaluationResults: []);
 
