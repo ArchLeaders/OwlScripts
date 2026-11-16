@@ -24,6 +24,9 @@ public sealed partial class MainViewModel : ObservableObject
     public partial BgymlFile? CurrentBgymlFile { get; set; }
 
     [ObservableProperty]
+    public partial int CurrentBgymlFileIndex { get; set; }
+
+    [ObservableProperty]
     public partial BgymlEntity? CurrentSelection { get; set; }
 
     [RelayCommand]
@@ -65,20 +68,31 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void PreviousFile()
     {
-        CurrentBgymlFile = CurrentBgymlType?.GetFileAfter(CurrentBgymlFile);
+        if (CurrentBgymlType is null) {
+            return;
+        }
+
+        CurrentBgymlFile = CurrentBgymlType.GetFileBefore(CurrentBgymlFile, out int index);
+        CurrentBgymlFileIndex = index + 1;
     }
 
     [RelayCommand]
     private void NextFile()
     {
-        CurrentBgymlFile = CurrentBgymlType?.GetFileBefore(CurrentBgymlFile);
+        if (CurrentBgymlType is null) {
+            return;
+        }
+
+        CurrentBgymlFile = CurrentBgymlType.GetFileAfter(CurrentBgymlFile, out int index);
+        CurrentBgymlFileIndex = index + 1;
     }
 
     partial void OnCurrentSelectionChanged(BgymlEntity? value)
     {
         if ((value as BgymlType ?? value?.Parent as BgymlType) is { } type && CurrentBgymlType != type) {
             CurrentBgymlType = type;
-            CurrentBgymlFile = type.GetFileAfter(null);
+            CurrentBgymlFile = type.GetFileAfter(null, out int index);
+            CurrentBgymlFileIndex = index + 1;
         }
     }
 
