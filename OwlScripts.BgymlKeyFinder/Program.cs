@@ -165,6 +165,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
                 }
 
                 exists = key == keys[i];
+                if (exists) break;
             }
 
             if (exists) {
@@ -186,7 +187,7 @@ static string? EvaluateMapElement(ref ImmutableByml root, int key, ImmutableByml
     }
 
     // Skip node types that can never make a useful ID
-    if (!value.Type.IsValueType() ||
+    if (value.Type.IsContainerType() ||
         value.Type is BymlNodeType.Double or BymlNodeType.Float or BymlNodeType.Bool or BymlNodeType.Null) {
         return null;
     }
