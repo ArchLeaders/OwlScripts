@@ -1,0 +1,93 @@
+<windowing:FAAppWindow xmlns="https://github.com/avaloniaui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+                       xmlns:models="clr-namespace:OwlScripts.BgymlKeyManager.Models"
+                       xmlns:vm="clr-namespace:OwlScripts.BgymlKeyManager.ViewModels"
+                       xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+                       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                       x:DataType="vm:MainViewModel"
+                       x:Class="OwlScripts.BgymlKeyManager.MainWindow"
+                       Title="Bgyml Array Key Manager">
+    <Grid x:Name="DropTarget" DragDrop.AllowDrop="True"
+          Background="Transparent"
+          Margin="14">
+        <TextBlock
+            x:Name="Instructions_Label"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            FontSize="24" FontWeight="Bold"
+            Opacity="0.8"
+            Text="Drag &amp; drop JSON output from BGYML key finder" />
+
+        <Grid ColumnDefinitions="*,*" IsVisible="False"
+              ColumnSpacing="16"
+              x:Name="EditorContent">
+            <Grid>
+                <TreeView x:Name="MainTreeView"
+                          SelectedItem="{Binding CurrentSelection}"
+                          ItemsSource="{Binding BgymlArrays}">
+                    <TreeView.DataTemplates>
+                        <TreeDataTemplate x:DataType="models:BgymlType"
+                                          ItemsSource="{Binding Arrays}">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <CheckBox ToolTip.Tip="Include"
+                                          IsChecked="{Binding Include}" />
+
+                                <TextBlock Grid.Column="1" Margin="-6,0,0,0"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Name}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </TreeDataTemplate>
+                        <TreeDataTemplate x:DataType="models:BgymlArray"
+                                          ItemsSource="{Binding PossibleKeys}">
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="2">
+                                <CheckBox ToolTip.Tip="Include"
+                                          IsChecked="{Binding Include}" />
+
+                                <TextBlock Grid.Column="1" Margin="-6,0,0,0"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Name}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </TreeDataTemplate>
+                        <DataTemplate x:DataType="models:BgymlArrayKey">
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="2">
+                                <CheckBox ToolTip.Tip="Include"
+                                          IsChecked="{Binding Include}" />
+
+                                <TextBlock Grid.Column="1" Margin="-6,0,0,0"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding Name}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </TreeView.DataTemplates>
+                </TreeView>
+            </Grid>
+
+            <Grid Grid.Column="1"
+                  RowDefinitions="Auto,*" RowSpacing="16">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="4">
+                    <Button Content="&lt;"
+                            Command="{Binding PreviousFileCommand}"
+                            VerticalAlignment="Center"/>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding CurrentBgymlFile.CanonicalFilePath}"
+                             Grid.Column="1" />
+                    <Button Grid.Column="2" Content="&gt;"
+                            Command="{Binding NextFileCommand}"
+                            VerticalAlignment="Center"/>
+                </Grid>
+
+                <avaloniaEdit:TextEditor
+                    x:Name="BgymlPreview" Grid.Row="1"
+                    ShowLineNumbers="True" />
+            </Grid>
+        </Grid>
+    </Grid>
+</windowing:FAAppWindow>
