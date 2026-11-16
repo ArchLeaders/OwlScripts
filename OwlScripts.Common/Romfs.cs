@@ -75,6 +75,7 @@ public sealed class Romfs
         foreach (var (file, data) in sarc) {
             var romfsFile = new RomfsFile {
                 CanonicalFilePath = file,
+                FilePath = target.FilePath,
                 FileVersion = target.FileVersion,
                 FileAttributes = RomfsFileAttributes.None,
                 Data = data
