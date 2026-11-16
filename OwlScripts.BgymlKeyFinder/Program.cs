@@ -73,8 +73,9 @@ var json = JsonSerializer.Serialize(
     context.EvaluationResults
         .OrderBy(x => x.Key)
         .ToDictionary(x => x.Key, x => new BgymlEvaluationResult(Arrays: x.Value.Arrays
-            .OrderBy(static x => x.Key)
-            .ToDictionary(), Files: [.. x.Value.Files.Order()])),
+            .OrderBy(static x => x.Key, StringComparer.Ordinal)
+            .ToDictionary(), Files: x.Value.Files
+            .OrderBy(static x => x.Key, StringComparer.Ordinal).ToDictionary())),
     options);
 
 File.WriteAllText(output, json);
@@ -97,7 +98,7 @@ static void EvaluateFile(RomfsFile file, ScriptContext context)
 
     ref var evaluation = ref CollectionsMarshal.GetValueRefOrAddDefault(context.EvaluationResults, bgymlTypeName, out _);
     evaluation ??= new BgymlEvaluationResult(Files: [], Arrays: []);
-    evaluation.Files.Add(file.CanonicalFilePath);
+    evaluation.Files.TryAdd(file.CanonicalFilePath, file.FilePath);
 
     EvaluateBymlMap(ref byml, byml.GetMap(), context, evaluation);
 }
