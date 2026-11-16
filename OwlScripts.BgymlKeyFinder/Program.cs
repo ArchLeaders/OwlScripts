@@ -71,7 +71,7 @@ foreach (string type in remove) {
 
 var json = JsonSerializer.Serialize(
     context.EvaluationResults
-        .OrderBy(x => x.Key)
+        .OrderBy(x => x.Key, StringComparer.Ordinal)
         .ToDictionary(x => x.Key, x => new BgymlEvaluationResult(Arrays: x.Value.Arrays
             .OrderBy(static x => x.Key, StringComparer.Ordinal)
             .ToDictionary(), Files: x.Value.Files
