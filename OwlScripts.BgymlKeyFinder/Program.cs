@@ -101,27 +101,32 @@ static void EvaluateFile(RomfsFile file, ScriptContext context)
 
     ref var evaluation = ref CollectionsMarshal.GetValueRefOrAddDefault(context.EvaluationResults, bgymlTypeName, out _);
     evaluation ??= new BgymlEvaluationResult(Files: [], Arrays: []);
-    evaluation.Files.TryAdd(file.CanonicalFilePath, file.FilePath);
 
-    EvaluateBymlMap(ref byml, byml.GetMap(), context, evaluation);
+    var results = InlineEvaluationResults.Default;
+    EvaluateBymlMap(ref byml, byml.GetMap(), context, evaluation, ref results);
+
+    if (results.FoundArrays) {
+        evaluation.Files.TryAdd(file.CanonicalFilePath, file.FilePath);
+    }
 }
 
-static void EvaluateBymlMap(ref ImmutableByml root, ImmutableBymlMap map, ScriptContext context, BgymlEvaluationResult evaluation)
+static void EvaluateBymlMap(ref ImmutableByml root, ImmutableBymlMap map, ScriptContext context, BgymlEvaluationResult evaluation, ref InlineEvaluationResults results)
 {
     foreach (var (key, child) in map) {
         if (child.Type is BymlNodeType.Map) {
-            EvaluateBymlMap(ref root, child.GetMap(), context, evaluation);
+            EvaluateBymlMap(ref root, child.GetMap(), context, evaluation, ref results);
         }
 
         if (child.Type is BymlNodeType.Array) {
+            results.FoundArrays = true;
             ref var keys = ref CollectionsMarshal.GetValueRefOrAddDefault(
-                evaluation.Arrays, root.KeyTable[key].ToManaged(), out bool exists);
-            EvaluateBymlArray(ref root, child.GetArray(), context, evaluation, ref keys);
+                evaluation.Arrays, root.KeyTable[key].ToManaged(), out bool _);
+            EvaluateBymlArray(ref root, child.GetArray(), context, evaluation, ref keys, ref results);
         }
     }
 }
 
-static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, ScriptContext context, BgymlEvaluationResult evaluation, ref List<string>? keys)
+static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, ScriptContext context, BgymlEvaluationResult evaluation, ref List<string>? keys, ref InlineEvaluationResults results)
 {
     if (array.Count == 0 || array[0].Type is not BymlNodeType.Map) {
         return;
@@ -134,7 +139,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
         keys = new List<string>(first.Count);
 
         foreach (var (keyIndex, value) in first) {
-            if (EvaluateMapElement(ref root, keyIndex, value, context, evaluation) is { } key) {
+            if (EvaluateMapElement(ref root, keyIndex, value, context, evaluation, ref results) is { } key) {
                 keys.Add(key);
             }
         }
@@ -155,7 +160,7 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
         for (int i = 0; i < keys.Count;) {
             bool exists = false;
             foreach (var (keyIndex, value) in map) {
-                if (EvaluateMapElement(ref root, keyIndex, value, context, evaluation) is not { } key) {
+                if (EvaluateMapElement(ref root, keyIndex, value, context, evaluation, ref results) is not { } key) {
                     continue;
                 }
 
@@ -172,11 +177,11 @@ static void EvaluateBymlArray(ref ImmutableByml root, ImmutableBymlArray array, 
     }
 }
 
-static string? EvaluateMapElement(ref ImmutableByml root, int key, ImmutableByml value, ScriptContext context, BgymlEvaluationResult evaluation)
+static string? EvaluateMapElement(ref ImmutableByml root, int key, ImmutableByml value, ScriptContext context, BgymlEvaluationResult evaluation, ref InlineEvaluationResults results)
 {
     // Recursively search maps
     if (value.Type is BymlNodeType.Map) {
-        EvaluateBymlMap(ref root, value.GetMap(), context, evaluation);
+        EvaluateBymlMap(ref root, value.GetMap(), context, evaluation, ref results);
         return null;
     }
 
