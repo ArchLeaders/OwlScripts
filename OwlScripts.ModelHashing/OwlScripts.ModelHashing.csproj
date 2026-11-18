@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <!-- For testing on TotK -->
+  <Import Condition="Exists('../Totk.props.user')" Project="../Totk.props.user" />
+
+  <ItemGroup>
+    <PackageReference Include="BfresLibrary" Version="1.6.0" />
+    <PackageReference Include="MeshCodecSharp" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OwlScripts.Common\OwlScripts.Common.csproj" />
+  </ItemGroup>
+
+</Project>

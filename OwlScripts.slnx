@@ -5,4 +5,5 @@
   <Project Path="OwlScripts.BgymlKeyFinder/OwlScripts.BgymlKeyFinder.csproj" />
   <Project Path="OwlScripts.BgymlKeyManager/OwlScripts.BgymlKeyManager.csproj" />
   <Project Path="OwlScripts.Common/OwlScripts.Common.csproj" />
+  <Project Path="OwlScripts.ModelHashing/OwlScripts.ModelHashing.csproj" />
 </Solution>
