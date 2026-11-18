@@ -2,6 +2,9 @@
   <Folder Name="/Internal/">
     <Project Path="Internal/OwlScripts.Benchmarks/OwlScripts.Benchmarks.csproj" />
   </Folder>
+  <Folder Name="/Libraries/">
+    <Project Path="Libraries/BfresLibrary/BfresLibrary/BfresLibrary.csproj" />
+  </Folder>
   <Project Path="OwlScripts.BgymlKeyFinder/OwlScripts.BgymlKeyFinder.csproj" />
   <Project Path="OwlScripts.BgymlKeyManager/OwlScripts.BgymlKeyManager.csproj" />
   <Project Path="OwlScripts.Common/OwlScripts.Common.csproj" />

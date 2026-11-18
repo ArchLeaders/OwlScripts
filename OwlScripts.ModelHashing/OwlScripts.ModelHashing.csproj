@@ -12,11 +12,12 @@
   <Import Condition="Exists('../Totk.props.user')" Project="../Totk.props.user" />
 
   <ItemGroup>
-    <PackageReference Include="BfresLibrary" Version="1.6.0" />
+<!--    <PackageReference Include="BfresLibrary" Version="1.6.0" />-->
     <PackageReference Include="MeshCodecSharp" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Libraries\BfresLibrary\BfresLibrary\BfresLibrary.csproj" />
     <ProjectReference Include="..\OwlScripts.Common\OwlScripts.Common.csproj" />
   </ItemGroup>
 
