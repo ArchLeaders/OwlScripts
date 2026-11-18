@@ -74,9 +74,16 @@ File.WriteAllText(outputJson, json);
 using var fs = File.Create(outputBinary);
 using var bw = new BinaryWriter(fs);
 
-foreach (var (name, hash) in context.Hashes) {
-    var nameHash = XxHash3.HashToUInt64(name.AsSpan().Cast<char, byte>());
+var hashesSorted = context.Hashes
+    .Select(kvp => (NameHash: XxHash3.HashToUInt64(kvp.Key.AsSpan().Cast<char, byte>()), kvp.Value))
+    .OrderBy(x => x.NameHash)
+    .ToArray();
+
+foreach (var (nameHash, _) in hashesSorted) {
     bw.Write(nameHash);
+}
+
+foreach (var (_, hash) in hashesSorted) {
     bw.Write((long)hash);
 }
 
