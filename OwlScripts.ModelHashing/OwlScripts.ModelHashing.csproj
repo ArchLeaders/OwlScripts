@@ -14,6 +14,7 @@
   <ItemGroup>
 <!--    <PackageReference Include="BfresLibrary" Version="1.6.0" />-->
     <PackageReference Include="MeshCodecSharp" Version="1.1.1" />
+    <PackageReference Include="System.IO.Hashing" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>

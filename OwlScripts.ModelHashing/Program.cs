@@ -1,6 +1,10 @@
 ﻿using System.Diagnostics;
+using System.IO.Hashing;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BfresLibrary;
+using CommunityToolkit.HighPerformance;
 using McSharp;
 using OwlScripts.Common;
 using OwlScripts.Common.Models;
@@ -14,6 +18,15 @@ Console.WriteLine($"""
     (c) Arch Leaders. MIT.
 
     """);
+
+if (args is not [var outputJson, var outputBinary]) {
+    Console.WriteLine("""
+        USAGE:
+
+        OwlScripts.BgymlKeyFinder <output-json> <output-binary>
+        """);
+    return;
+}
 
 if (Config.Shared.GameDumpFolderPath is null) {
 Retry:
@@ -44,6 +57,29 @@ var endingTimestamp = Stopwatch.GetTimestamp();
 var elapsedTime = Stopwatch.GetElapsedTime(startingTimestamp, endingTimestamp);
 
 Console.WriteLine($"Evaluated {context.FilesHandled.Count:N0} files in {elapsedTime.Seconds} seconds");
+
+var options = new JsonSerializerOptions {
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+};
+
+var json = JsonSerializer.Serialize(
+    context.Hashes
+        .OrderBy(x => x.Key, StringComparer.Ordinal)
+        .ToDictionary(),
+    options);
+
+File.WriteAllText(outputJson, json);
+
+using var fs = File.Create(outputBinary);
+using var bw = new BinaryWriter(fs);
+
+foreach (var (name, hash) in context.Hashes) {
+    var nameHash = XxHash3.HashToUInt64(name.AsSpan().Cast<char, byte>());
+    bw.Write(nameHash);
+    bw.Write((long)hash);
+}
+
 return;
 
 static void CollectHashes(RomfsFile file, ScriptContext context)
